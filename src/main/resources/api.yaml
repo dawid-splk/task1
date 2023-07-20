@@ -1,0 +1,262 @@
+openapi: 3.0.3
+info:
+  title: Shop
+  description: Shop API built using OpenAPI and Swagger
+  version: 1.0.0
+servers:
+  - url: 'https:localhost:8080'
+paths:
+  /product:
+    put:
+      tags:
+        - product
+      summary: Update an existing product
+      description: Update an existing product by id
+      operationId: updateProduct
+      requestBody:
+        description: Update an existing product in the shop
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '200':
+          description: Succesful operation
+          content: # maybe response noContent?
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Product not found
+        '405':
+          description: Validation exception
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
+    post:
+      tags:
+        - product
+      summary: Add a product
+      description: Add a new product to the shop
+      operationId: addProduct
+      requestBody:
+        description: Create a new product in the shop
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '200':
+          description: Succesful operation
+          content: # maybe response noContent?
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '405':
+          description: Invalid input
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
+  /product/findByCategory:
+    get:
+      tags:
+        - product
+      summary: Find products by categories
+      description: Returns all products matching the specified categories
+      operationId: findProductsByCategory
+      parameters:
+        - name: category
+          in: query
+          description: Categories to filter by
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid tag value
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
+  /product/{productName}:
+    get:
+      tags:
+        - product
+      summary: Find product by name
+      description: Returns a single product
+      operationId: getProductByName
+      parameters:
+        - name: productName
+          in: path
+          description: name of the product to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid name supplied
+        '404':
+          description: Product not found
+      security:
+        - api_key: []
+        - product_auth:
+            - write:products
+            - read:products
+    post:
+      tags:
+        - product
+      summary: Updates a product in the store
+      description: ''
+      operationId: updateProductWithForm
+      parameters:
+        - name: productName
+          in: path
+          description: name of product to be updated
+          required: true
+          schema:
+            type: string
+        - name: newName
+          in: query
+          description: New name of specified product
+          schema:
+            type: string
+        - name: price
+          in: query
+          description: New price of product
+          schema:
+            type: number
+            format: float
+        - name: category
+          in: query
+          description: New category of product
+          schema:
+            type: string
+            enum:
+              - fruit
+              - vegetables
+              - dairy products
+              - meat
+              - seafood
+              - bakery items
+              - snacks
+              - beverages
+        - name: expiryDate
+          in: query
+          description: New expiry date of product
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
+    delete:
+      tags:
+        - product
+      summary: Deletes a product
+      description: delete a product
+      operationId: deleteProduct
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: productName
+          in: path
+          description: name of product to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid product value
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of product
+          example: milk
+        price:
+          type: number
+          format: float
+          example: 14.99
+        category:
+          type: string
+          description: product category
+          example: dairy
+          enum:
+            - fruit
+            - vegetables
+            - dairy products
+            - meat
+            - seafood
+            - bakery items
+            - snacks
+            - beverages
+        expiry_date:
+          type: string
+          format: date-time
+      xml:
+        name: product
