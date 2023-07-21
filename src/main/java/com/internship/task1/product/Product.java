@@ -1,10 +1,10 @@
-/*
 package com.internship.task1.product;
 
 import jakarta.persistence.*;
 import org.joda.time.DateTime;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
+import org.openapitools.model.Product.CategoryEnum;
 
 @Entity
 @Table(name = "products")
@@ -15,18 +15,18 @@ public class Product {
 
     private String name;
     private float price;
-    private org.openapitools.model.Product.CategoryEnum category;
-    private OffsetDateTime expiryDate;
+    private CategoryEnum category;
+    private LocalDateTime expiryDate;
 
     public Product() {
     }
 
-    public Product(org.openapitools.model.Product product) {
-        this.id = product.getId();
-        this.name = product.getName();
-        this.price = product.getPrice();
-        this.category = product.getCategory();
-        this.expiryDate = product.getExpiryDate();
+    public Product(Long id, String name, float price, CategoryEnum category, LocalDateTime expiryDate) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+        this.expiryDate = expiryDate;
     }
 
     protected String getName() {
@@ -45,24 +45,27 @@ public class Product {
         this.price = price;
     }
 
-    protected org.openapitools.model.Product.CategoryEnum getCategory() {
+    protected CategoryEnum getCategory() {
         return category;
     }
 
-    protected void setCategory(org.openapitools.model.Product.CategoryEnum category) {
+    protected void setCategory(CategoryEnum category) {
         this.category = category;
     }
 
-    protected OffsetDateTime getExpiryDate() {
+    protected LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
-    protected void setExpiryDate(OffsetDateTime expiryDate) {
+    protected void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
 
     protected Long getId() {
         return id;
     }
+
+    protected void setId(Long id) {
+        this.id = id;
+    }
 }
-*/

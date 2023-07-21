@@ -4,25 +4,28 @@ import org.openapitools.model.Product;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductService {
     private final ProductRepository repository;
+    private final ProductMapper mapper;
 
-    ProductService(ProductRepository repository) {
+    public ProductService(ProductRepository repository, ProductMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
+
 
     //TODO //konstruktor? -> jaki?
 
     Product save(Product product) {
-        return repository.save(product);
+        repository.save(mapper.toProduct(product));
+        return product;
     }
 
     void deleteProduct(Long id) {
-        Optional<Product> productOptional = repository.findProductById(id);     //TODO nie wiem czy findProductById bedzie dzialalo Long vs int, moze bredze
+        Optional<com.internship.task1.product.Product> productOptional = repository.findProductById(id);     //TODO nie wiem czy findProductById bedzie dzialalo Long vs int, moze bredze
         productOptional.ifPresent(repository::delete);
     }
 
