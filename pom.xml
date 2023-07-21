@@ -122,6 +122,9 @@
 							<inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<configOptions>
+								<useJakartaEe>
+									true
+								</useJakartaEe>
 								<sourceFolder>src/gen/java/main</sourceFolder>
 							</configOptions>
 						</configuration>
