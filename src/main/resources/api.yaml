@@ -11,10 +11,10 @@ paths:
       tags:
         - product
       summary: Update an existing product
-      description: Update an existing product by id
+      description: Update an existing product
       operationId: updateProduct
       requestBody:
-        description: Update an existing product in the shop
+        description: product object with desired values
         content:
           application/json:
             schema:
@@ -27,21 +27,10 @@ paths:
               $ref: '#/components/schemas/Product'
         required: true
       responses:
-        '200':
-          description: Succesful operation
-          content: # maybe response noContent?
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          description: Invalid ID supplied
         '404':
           description: Product not found
         '405':
-          description: Validation exception
+          description: Invalid input
       security:
         - shop_auth:
             - write:products
@@ -118,20 +107,21 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-  /product/{productName}:
+  /product/{productId}:
     get:
       tags:
         - product
-      summary: Find product by name
+      summary: Find product by ID
       description: Returns a single product
-      operationId: getProductByName
+      operationId: getProductById
       parameters:
-        - name: productName
+        - name: productId
           in: path
-          description: name of the product to return
+          description: ID of the product to return
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '200':
           description: successful operation
@@ -143,27 +133,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
-          description: Invalid name supplied
+          description: Invalid ID supplied
         '404':
           description: Product not found
       security:
-        - api_key: []
         - product_auth:
             - write:products
             - read:products
-    post:
+    patch:
       tags:
         - product
       summary: Updates a product in the store
       description: ''
       operationId: updateProductWithForm
       parameters:
-        - name: productName
+        - name: productId
           in: path
-          description: name of product to be updated
+          description: ID of product to be updated
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
         - name: newName
           in: query
           description: New name of specified product
@@ -196,6 +186,8 @@ paths:
             type: string
             format: date-time
       responses:
+        '404':
+          description: Product not found
         '405':
           description: Invalid input
       security:
@@ -209,18 +201,13 @@ paths:
       description: delete a product
       operationId: deleteProduct
       parameters:
-        - name: api_key
-          in: header
-          description: ''
-          required: false
-          schema:
-            type: string
-        - name: productName
+        - name: productId
           in: path
-          description: name of product to delete
+          description: ID of product to delete
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '400':
           description: Invalid product value
@@ -234,6 +221,11 @@ components:
     Product:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
+          description: unique id of product
+          example: 27
         name:
           type: string
           description: name of product
