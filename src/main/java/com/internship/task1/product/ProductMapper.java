@@ -1,8 +1,7 @@
 package com.internship.task1.product;
 
-//import org.openapitools.model.Product;
-
-import org.openapitools.model.ProductDTO;
+import org.openapitools.model.ProductDtoRead;
+import org.openapitools.model.ProductDtoWrite;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,12 +14,12 @@ public class ProductMapper {
     public ProductMapper() {
     }
 
-    public ProductDTO toDTO(Product product){
+    public ProductDtoRead toDtoRead(Product product){
         ZoneOffset zoneOffset = ZoneOffset.of("+01:00");
         LocalDateTime localDateTime = product.getExpiryDate();
         OffsetDateTime offsetDateTime = localDateTime.atOffset(zoneOffset);
 
-        ProductDTO result = new ProductDTO();
+        ProductDtoRead result = new ProductDtoRead();
         result.setId(product.getId());
         result.setName(product.getName());
         result.setPrice(product.getPrice());
@@ -30,12 +29,25 @@ public class ProductMapper {
         return result;
     }
 
-    public Product toProduct(ProductDTO dto){
+    public Product fromDtoWriteToProduct(ProductDtoWrite dto){
 
         Product result = new Product();
-        if(dto.getId() != null) {
-            result.setId(dto.getId());
-        }
+//        if(dto.getId() != null) {         //TODO toProductFromDtoRead
+//            result.setId(dto.getId());
+//        }
+        result.setName(dto.getName());
+        result.setPrice(dto.getPrice());
+        result.setCategory(dto.getCategory());
+        result.setExpiryDate(dto.getExpiryDate().toLocalDateTime());
+
+        return result;
+    }
+
+    public Product fromDtoReadToProduct(ProductDtoRead dto){
+
+        Product result = new Product();
+
+        result.setId(dto.getId());
         result.setName(dto.getName());
         result.setPrice(dto.getPrice());
         result.setCategory(dto.getCategory());

@@ -2,7 +2,8 @@ package com.internship.task1.product;
 
 import jakarta.validation.constraints.NotNull;
 import org.openapitools.api.ProductApi;
-import org.openapitools.model.ProductDTO;
+import org.openapitools.model.ProductDtoRead;
+import org.openapitools.model.ProductDtoWrite;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -18,7 +19,7 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
     ProductService service;
 
     @Override
-    public ResponseEntity<List<ProductDTO>> readAll(){
+    public ResponseEntity<List<ProductDtoRead>> readAll(){
         return ResponseEntity.ok(service.readAll());
     }
 
@@ -32,8 +33,8 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
     }
 
     @Override
-    public ResponseEntity<ProductDTO> addProduct(ProductDTO product) {
-        ProductDTO response = service.save(product);
+    public ResponseEntity<ProductDtoRead> addProduct(ProductDtoWrite product) {
+        ProductDtoRead response = service.save(product);
         return ResponseEntity.created(URI.create("/" + response.getId())).body(response);
     }
 
@@ -47,13 +48,13 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
     }
 
     @Override
-    public ResponseEntity<List<ProductDTO>> findProductsByCategory(@NotNull String category) {
+    public ResponseEntity<List<ProductDtoRead>> findProductsByCategory(@NotNull String category) {
         return ResponseEntity.ok(service.findProductsByCategory(category));
     }
 
     @Override
-    public ResponseEntity<ProductDTO> getProductById(Long productId) {
-        ProductDTO result = service.findProductById(productId);            //TODO to mi sie nie podoba - czy zrobic to inaczej? (metoda w service i metoda w controller)
+    public ResponseEntity<ProductDtoRead> getProductById(Long productId) {
+        ProductDtoRead result = service.findProductById(productId);            //TODO to mi sie nie podoba - czy zrobic to inaczej? (metoda w service i metoda w controller)
         if (result == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -62,7 +63,7 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
     }
 
     @Override
-    public ResponseEntity<Void> updateProduct(ProductDTO product) {
+    public ResponseEntity<Void> updateProduct(ProductDtoRead product) {
         boolean isSuccesful = service.updateProduct(product);
         if(isSuccesful){
             return ResponseEntity.noContent().build();

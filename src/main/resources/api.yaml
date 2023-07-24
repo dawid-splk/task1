@@ -21,12 +21,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/ProductDtoRead'
             application/xml:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/ProductDtoRead'
       security:
         - shop_auth:
             - write:products
@@ -42,13 +42,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoRead'
           application/xml:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoRead'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoRead'
         required: true
       responses:
         '404':
@@ -70,24 +70,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoWrite'
           application/xml:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoWrite'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductDtoWrite'
         required: true
       responses:
         '200':
           description: Succesful operation
-          content: # maybe response noContent?
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductDTO'
+                $ref: '#/components/schemas/ProductDtoRead'
             application/xml:
               schema:
-                $ref: '#/components/schemas/ProductDTO'
+                $ref: '#/components/schemas/ProductDtoRead'
         '405':
           description: Invalid input
       security:
@@ -126,12 +126,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/ProductDtoRead'
             application/xml:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductDTO'
+                  $ref: '#/components/schemas/ProductDtoRead'
         '400':
           description: Invalid tag value
       security:
@@ -159,10 +159,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductDTO'
+                $ref: '#/components/schemas/ProductDtoRead'
             application/xml:
               schema:
-                $ref: '#/components/schemas/ProductDTO'
+                $ref: '#/components/schemas/ProductDtoRead'
         '400':
           description: Invalid ID supplied
         '404':
@@ -249,7 +249,7 @@ paths:
 
 components:
   schemas:
-    ProductDTO:
+    ProductDtoRead:
       type: object
       properties:
         id:
@@ -266,20 +266,40 @@ components:
           format: float
           example: 14.99
         category:
-          type: string
-          description: product category
-          example: dairy
-          enum:
-            - fruit
-            - vegetables
-            - dairy products
-            - meat
-            - seafood
-            - bakery items
-            - snacks
-            - beverages
+          $ref: '#/components/schemas/CategoryEnum'
         expiry_date:
           type: string
-          format: date-time   #TODO sprobowac date zeby dostac LocalDateTime
+          format: date-time
       xml:
-        name: product
+        name: productRead
+
+    ProductDtoWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of product
+          example: milk
+        price:
+          type: number
+          format: float
+          example: 14.99
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        expiry_date:
+          type: string
+          format: date-time
+      xml:
+        name: productWrite
+
+    CategoryEnum:
+      type: string
+      enum:
+        - fruit
+        - vegetables
+        - dairy products
+        - meat
+        - seafood
+        - bakery items
+        - snacks
+        - beverages

@@ -1,6 +1,8 @@
 package com.internship.task1.product;
 
-import org.openapitools.model.ProductDTO;
+import org.openapitools.model.CategoryEnum;
+import org.openapitools.model.ProductDtoRead;
+import org.openapitools.model.ProductDtoWrite;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,11 +28,10 @@ public class ProductService {
 
     //TODO //konstruktor? -> jaki?
 
-    ProductDTO save(ProductDTO product) {
-        Product productToAdd = mapper.toProduct(product);
+    ProductDtoRead save(ProductDtoWrite product) {
+        Product productToAdd = mapper.fromDtoWriteToProduct(product);
         repository.save(productToAdd);
-        product.setId(productToAdd.getId());
-        return product;
+        return mapper.toDtoRead(productToAdd);
     }
 
     boolean deleteProduct(Long id) {
@@ -40,26 +41,26 @@ public class ProductService {
         return isFound;
     }
 
-    public List<ProductDTO> findProductsByCategory(String category) {
-        return repository.findAllByCategory(ProductDTO.CategoryEnum.fromValue(category)).stream().map(mapper::toDTO).collect(Collectors.toList());
+    public List<ProductDtoRead> findProductsByCategory(String category) {
+        return repository.findAllByCategory(CategoryEnum.fromValue(category)).stream().map(mapper::toDtoRead).collect(Collectors.toList());
     }
 
-    ProductDTO findProductById(Long id) {
+    ProductDtoRead findProductById(Long id) {
         Optional<Product> productOptional = repository.findProductById(id);
         if(productOptional.isPresent()){
-            return mapper.toDTO(productOptional.get());
+            return mapper.toDtoRead(productOptional.get());
         } else {
             return null;
         }
     }
 
-    boolean updateProduct(ProductDTO productDto) {
+    boolean updateProduct(ProductDtoRead productDto) {
         var id = productDto.getId();
 
         Optional<Product> productOptional = repository.findProductById(id);
 
         if(productOptional.isPresent()){
-            repository.save(mapper.toProduct(productDto));                 //TODO sprawdzic
+            repository.save(mapper.fromDtoReadToProduct(productDto));
             return true;
         } else {
             return false;
@@ -77,7 +78,7 @@ public class ProductService {
                 toUpdate.setPrice(price);
             }
             if(category != null) {
-                toUpdate.setCategory(ProductDTO.CategoryEnum.fromValue(category));
+                toUpdate.setCategory(CategoryEnum.fromValue(category));
             }
             if(expiryDate != null) {
                 toUpdate.setExpiryDate(expiryDate.toLocalDateTime());
@@ -89,12 +90,12 @@ public class ProductService {
         }
     }
 
-    public List<ProductDTO> readAll() {
-        return repository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    public List<ProductDtoRead> readAll() {
+        return repository.findAll().stream().map(mapper::toDtoRead).collect(Collectors.toList());
     }
 
 //    private Optional<Product> exists(Long id) {
-//        if(!(id instanceof Long) || id < 0) {       //TODO czemu krzyczy jak mozna przekazac stringa w request body? ...czy nie mozna?
+//        if(!(id instanceof Long) || id < 0) {
 //            return Optional.empty();
 //        }
 //        Optional<Product> productOptional = repository.findProductById(id);

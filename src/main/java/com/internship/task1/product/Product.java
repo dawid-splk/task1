@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
-import org.openapitools.model.ProductDTO.CategoryEnum;
+import org.openapitools.model.CategoryEnum;
 
 @Entity
 @Table(name = "products")
