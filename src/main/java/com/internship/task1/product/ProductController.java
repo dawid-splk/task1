@@ -1,7 +1,8 @@
 package com.internship.task1.product;
 
+import jakarta.validation.constraints.NotNull;
 import org.openapitools.api.ProductApi;
-import org.openapitools.model.Product;
+import org.openapitools.model.ProductDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -12,9 +13,18 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements ProductApi {
+public class ProductController implements ProductApi {          //TODO ENDPOINT /PRODUCTS ZWERYFIKOWAC BO MIESZA
 
     ProductService service;
+
+    @Override
+    public ResponseEntity<List<ProductDTO>> readAll(){
+        return ResponseEntity.ok(service.readAll());
+    }
+
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
 
     @Override
     public Optional<NativeWebRequest> getRequest() {
@@ -22,8 +32,8 @@ public class ProductController implements ProductApi {
     }
 
     @Override
-    public ResponseEntity<Product> addProduct(Product product) {
-        Product response = service.save(product);
+    public ResponseEntity<ProductDTO> addProduct(ProductDTO product) {
+        ProductDTO response = service.save(product);
         return ResponseEntity.created(URI.create("/" + response.getId())).body(response);
     }
 
@@ -34,13 +44,13 @@ public class ProductController implements ProductApi {
     }
 
     @Override
-    public ResponseEntity<List<Product>> findProductsByCategory(List<String> category) {
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<ProductDTO>> findProductsByCategory(@NotNull String category) {
+        return ResponseEntity.ok(service.findProductsByCategory(category));
     }
 
     @Override
-    public ResponseEntity<Product> getProductById(Long productId) {
-        Product result = service.findProductById(productId);            //TODO to mi sie nie podoba - czy zrobic to inaczej? (metoda w service i metoda w controller)
+    public ResponseEntity<ProductDTO> getProductById(Long productId) {
+        ProductDTO result = service.findProductById(productId);            //TODO to mi sie nie podoba - czy zrobic to inaczej? (metoda w service i metoda w controller)
         if (result == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -49,7 +59,7 @@ public class ProductController implements ProductApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateProduct(Product product) {
+    public ResponseEntity<Void> updateProduct(ProductDTO product) {
         boolean isSuccesful = service.updateProduct(product);
         if(isSuccesful){
             return ResponseEntity.noContent().build();
@@ -58,14 +68,14 @@ public class ProductController implements ProductApi {
         }
     }
 
-    @Override   //TODO ile kodu ma byc w kontrolerze a ile w serwisie - updateProductWithForm vs updateProduct
-    public ResponseEntity<Void> updateProductWithForm(Long productId, String newName, Float price, String category, OffsetDateTime expiryDate) {
-        Product result = service.findProductById(productId);
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            service.updateProduct(result, newName, price, category, expiryDate);
+    @Override
+    public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, OffsetDateTime expiryDate) {
+        boolean isSuccesful = service.updateProduct(productId, name, price, category, expiryDate);
+
+        if(isSuccesful){
             return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 

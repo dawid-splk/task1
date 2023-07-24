@@ -1,15 +1,22 @@
 package com.internship.task1.product;
 
-import org.openapitools.model.Product;
+import org.openapitools.model.ProductDTO;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
-    private final ProductRepository repository;
-    private final ProductMapper mapper;
+    private ProductRepository repository;
+    private ProductMapper mapper;
+
+//    public ProductService() {
+//    }
 
     public ProductService(ProductRepository repository, ProductMapper mapper) {
         this.repository = repository;
@@ -19,71 +26,76 @@ public class ProductService {
 
     //TODO //konstruktor? -> jaki?
 
-    Product save(Product product) {
+    ProductDTO save(ProductDTO product) {
         repository.save(mapper.toProduct(product));
         return product;
     }
 
     void deleteProduct(Long id) {
-        Optional<com.internship.task1.product.Product> productOptional = repository.findProductById(id);     //TODO nie wiem czy findProductById bedzie dzialalo Long vs int, moze bredze
+        Optional<Product> productOptional = repository.findProductById(id);     //TODO nie wiem czy findProductById bedzie dzialalo Long vs int, moze bredze
         productOptional.ifPresent(repository::delete);
     }
 
-//    public List<Product> findProductsByCategory(List<String> category) {
-//        return repository.findAllByCategory((Product.CategoryEnum) category);
-//    }
+    public List<ProductDTO> findProductsByCategory(String category) {
+        return repository.findAllByCategory(ProductDTO.CategoryEnum.fromValue(category)).stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
 
-    Product findProductById(Long id) {
+    ProductDTO findProductById(Long id) {
         Optional<Product> productOptional = repository.findProductById(id);
-        return productOptional.orElse(null);
+        if(productOptional.isPresent()){
+            return mapper.toDTO(productOptional.get());
+        } else {
+            return null;
+        }
     }
 
+    boolean updateProduct(ProductDTO productDto) {
+        var id = productDto.getId();
 
-    void updateProduct(Product product, String newName, Float price, String category, OffsetDateTime expiryDate) {
-        if(newName != null) {
-            product.setName(newName);
-        }
-        if(price != null) {
-            product.setPrice(price);
-        }
-        if(category != null) {
-            product.setCategory(org.openapitools.model.Product.CategoryEnum.valueOf(category));
-        }
-        if(expiryDate != null) {
-            product.setExpiryDate(expiryDate);
-        }
+        Optional<Product> productOptional = repository.findProductById(id);
 
-    }
-
-    boolean updateProduct(Product product) {
-        var id = product.getId();
-        if(!(id instanceof Long) || id < 0) {     //TODO czemu krzyczy jak mozna przekazac stringa?
-            return false;
-        }
-        Optional<Product> currentOptional = repository.findProductById(id);
-
-
-
-        if(currentOptional.isPresent()){
-            repository.save(product);
+        if(productOptional.isPresent()){
+            repository.save(mapper.toProduct(productDto));                 //TODO sprawdzic
             return true;
         } else {
             return false;
         }
+    }
+    boolean updateProduct(Long productId, String name, Float price, String category, @RequestParam("expiryDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
+        Optional<Product> productOptional = repository.findProductById(productId);
 
-//        if(currentOptional.isPresent()){
-//            updateFrom(currentOptional.get(), product);
-//            repository.save(currentOptional.get())
-//            return true;
-//        } else {
-//            return false;
-//        }
+        if(productOptional.isPresent()){
+            Product toUpdate = productOptional.get();
+            if(name != null) {
+                toUpdate.setName(name);
+            }
+            if(price != null) {
+                toUpdate.setPrice(price);
+            }
+            if(category != null) {
+                toUpdate.setCategory(ProductDTO.CategoryEnum.fromValue(category));
+            }
+            if(expiryDate != null) {
+                toUpdate.setExpiryDate(expiryDate.toLocalDateTime());
+            }
+            repository.save(toUpdate);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-//    private void updateFrom(Product current, Product toUpdate) {
-//        current.setName(toUpdate.getName());
-//        current.setCategory(toUpdate.getCategory());
-//        current.setPrice(toUpdate.getPrice());
-//        current.setExpiryDate(toUpdate.getExpiryDate());
+    public List<ProductDTO> readAll() {
+        return repository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+
+//    private Optional<Product> exists(Long id) {
+//        if(!(id instanceof Long) || id < 0) {       //TODO czemu krzyczy jak mozna przekazac stringa w request body? ...czy nie mozna?
+//            return Optional.empty();
+//        }
+//        Optional<Product> productOptional = repository.findProductById(id);
+//
+//        return productOptional;
+//
 //    }
 }

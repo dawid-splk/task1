@@ -7,6 +7,30 @@ servers:
   - url: 'https:localhost:8080'
 paths:
   /product:
+    get:
+      tags:
+        - product
+      summary: Lists all the products
+      description: Lists all the products
+      operationId: readAll
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+      security:
+        - shop_auth:
+            - write:products
+            - read:products
     put:
       tags:
         - product
@@ -18,13 +42,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
           application/xml:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
         required: true
       responses:
         '404':
@@ -46,13 +70,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
           application/xml:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductDTO'
         required: true
       responses:
         '200':
@@ -60,10 +84,10 @@ paths:
           content: # maybe response noContent?
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductDTO'
             application/xml:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductDTO'
         '405':
           description: Invalid input
       security:
@@ -74,19 +98,26 @@ paths:
     get:
       tags:
         - product
-      summary: Find products by categories
-      description: Returns all products matching the specified categories
+      summary: Find products by category
+      description: Returns all products matching the specified category
       operationId: findProductsByCategory
       parameters:
         - name: category
           in: query
-          description: Categories to filter by
-          required: false
+          description: Category to filter by
+          required: true
           explode: true
           schema:
-            type: array
-            items:
-              type: string
+            type: string
+            enum:
+              - fruit
+              - vegetables
+              - dairy products
+              - meat
+              - seafood
+              - bakery items
+              - snacks
+              - beverages
       responses:
         '200':
           description: successful operation
@@ -95,12 +126,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: '#/components/schemas/ProductDTO'
             application/xml:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: '#/components/schemas/ProductDTO'
         '400':
           description: Invalid tag value
       security:
@@ -128,10 +159,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductDTO'
             application/xml:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductDTO'
         '400':
           description: Invalid ID supplied
         '404':
@@ -154,7 +185,7 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: newName
+        - name: name
           in: query
           description: New name of specified product
           schema:
@@ -218,7 +249,7 @@ paths:
 
 components:
   schemas:
-    Product:
+    ProductDTO:
       type: object
       properties:
         id:
@@ -249,6 +280,6 @@ components:
             - beverages
         expiry_date:
           type: string
-          format: date-time
+          format: date-time   #TODO sprobowac date zeby dostac LocalDateTime
       xml:
         name: product
