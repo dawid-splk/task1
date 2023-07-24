@@ -39,8 +39,11 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
 
     @Override
     public ResponseEntity<Void> deleteProduct(Long productId) {
-        service.deleteProduct(productId);
-        return ResponseEntity.noContent().build();
+        if(service.deleteProduct(productId)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override

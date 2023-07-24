@@ -27,13 +27,17 @@ public class ProductService {
     //TODO //konstruktor? -> jaki?
 
     ProductDTO save(ProductDTO product) {
-        repository.save(mapper.toProduct(product));
+        Product productToAdd = mapper.toProduct(product);
+        repository.save(productToAdd);
+        product.setId(productToAdd.getId());
         return product;
     }
 
-    void deleteProduct(Long id) {
-        Optional<Product> productOptional = repository.findProductById(id);     //TODO nie wiem czy findProductById bedzie dzialalo Long vs int, moze bredze
+    boolean deleteProduct(Long id) {
+        Optional<Product> productOptional = repository.findProductById(id);
+        boolean isFound = productOptional.isPresent();
         productOptional.ifPresent(repository::delete);
+        return isFound;
     }
 
     public List<ProductDTO> findProductsByCategory(String category) {
