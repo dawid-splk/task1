@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements ProductApi {          //TODO ENDPOINT /PRODUCTS ZWERYFIKOWAC BO MIESZA
+public class ProductController implements ProductApi {
 
     ProductService service;
 
@@ -40,11 +40,7 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
 
     @Override
     public ResponseEntity<Void> deleteProduct(Long productId) {
-        if(service.deleteProduct(productId)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return service.deleteProduct(productId);
     }
 
     @Override
@@ -54,34 +50,17 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
 
     @Override
     public ResponseEntity<ProductDtoRead> getProductById(Long productId) {
-        ProductDtoRead result = service.findProductById(productId);            //TODO to mi sie nie podoba - czy zrobic to inaczej? (metoda w service i metoda w controller)
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(result);
-        }
+        return service.findProductById(productId);
     }
 
     @Override
     public ResponseEntity<Void> updateProduct(ProductDtoRead product) {
-        boolean isSuccesful = service.updateProduct(product);
-        if(isSuccesful){
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return service.updateProduct(product);
     }
 
     @Override
     public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, OffsetDateTime expiryDate) {
-        boolean isSuccesful = service.updateProduct(productId, name, price, category, expiryDate);
-
-        if(isSuccesful){
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return service.updateProduct(productId, name, price, category, expiryDate);
     }
-
 
 }
