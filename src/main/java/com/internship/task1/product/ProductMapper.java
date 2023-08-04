@@ -32,9 +32,6 @@ public class ProductMapper {
     public Product fromDtoWriteToProduct(ProductDtoWrite dto){
 
         Product result = new Product();
-//        if(dto.getId() != null) {         //TODO toProductFromDtoRead
-//            result.setId(dto.getId());
-//        }
         result.setName(dto.getName());
         result.setPrice(dto.getPrice());
         result.setCategory(dto.getCategory());
