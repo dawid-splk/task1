@@ -1,7 +1,7 @@
 package com.internship.task1.product;
 
 import jakarta.validation.constraints.NotNull;
-import org.openapitools.api.ProductApi;
+import org.openapitools.api.ProductsApi;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements ProductApi {          //TODO ENDPOINT /PRODUCTS ZWERYFIKOWAC BO MIESZA
+public class ProductController implements ProductsApi {          //TODO ENDPOINT /PRODUCTS ZWERYFIKOWAC BO MIESZA
 
     ProductService service;
 
@@ -29,7 +29,7 @@ public class ProductController implements ProductApi {          //TODO ENDPOINT 
 
     @Override
     public Optional<NativeWebRequest> getRequest() {
-        return ProductApi.super.getRequest();
+        return ProductsApi.super.getRequest();
     }
 
     @Override

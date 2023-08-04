@@ -6,7 +6,7 @@ info:
 servers:
   - url: 'https:localhost:8080'
 paths:
-  /product:
+  /products:
     get:
       tags:
         - product
@@ -94,7 +94,7 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-  /product/findByCategory:
+  /products/findByCategory:
     get:
       tags:
         - product
@@ -138,7 +138,7 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-  /product/{productId}:
+  /products/{productId}:
     get:
       tags:
         - product
