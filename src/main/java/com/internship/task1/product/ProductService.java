@@ -4,6 +4,7 @@ import org.openapitools.model.CategoryEnum;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -26,47 +27,51 @@ public class ProductService {
     }
 
 
-    //TODO //konstruktor? -> jaki?
-
     ProductDtoRead save(ProductDtoWrite product) {
         Product productToAdd = mapper.fromDtoWriteToProduct(product);
         repository.save(productToAdd);
         return mapper.toDtoRead(productToAdd);
     }
 
-    boolean deleteProduct(Long id) {
-        Optional<Product> productOptional = repository.findProductById(id);
-        boolean isFound = productOptional.isPresent();
-        productOptional.ifPresent(repository::delete);
-        return isFound;
-    }
-
-    public List<ProductDtoRead> findProductsByCategory(String category) {
-        return repository.findAllByCategory(CategoryEnum.fromValue(category)).stream().map(mapper::toDtoRead).collect(Collectors.toList());
-    }
-
-    ProductDtoRead findProductById(Long id) {
+    ResponseEntity<Void> deleteProduct(Long id) {
         Optional<Product> productOptional = repository.findProductById(id);
         if(productOptional.isPresent()){
-            return mapper.toDtoRead(productOptional.get());
+            productOptional.ifPresent(repository::delete);
+            return ResponseEntity.noContent().build();
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
     }
 
-    boolean updateProduct(ProductDtoRead productDto) {
+    public List<ProductDtoRead> findProductsByCategory(String category) {
+        return repository.findAllByCategory(CategoryEnum.fromValue(category))
+                .stream().map(mapper::toDtoRead)
+                .collect(Collectors.toList());
+    }
+
+    ResponseEntity<ProductDtoRead> findProductById(Long id) {
+        Optional<Product> productOptional = repository.findProductById(id);
+        if(productOptional.isPresent()){
+            return ResponseEntity.ok(mapper.toDtoRead(productOptional.get()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    ResponseEntity<Void> updateProduct(ProductDtoRead productDto) {
         var id = productDto.getId();
 
         Optional<Product> productOptional = repository.findProductById(id);
 
         if(productOptional.isPresent()){
             repository.save(mapper.fromDtoReadToProduct(productDto));
-            return true;
+            return ResponseEntity.noContent().build();
         } else {
-            return false;
+            return ResponseEntity.notFound().build();
         }
     }
-    boolean updateProduct(Long productId, String name, Float price, String category, @RequestParam("expiryDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
+
+    ResponseEntity<Void> updateProduct(Long productId, String name, Float price, String category, @RequestParam("expiryDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
         Optional<Product> productOptional = repository.findProductById(productId);
 
         if(productOptional.isPresent()){
@@ -84,23 +89,13 @@ public class ProductService {
                 toUpdate.setExpiryDate(expiryDate.toLocalDateTime());
             }
             repository.save(toUpdate);
-            return true;
+            return ResponseEntity.noContent().build();
         } else {
-            return false;
+            return ResponseEntity.notFound().build();
         }
     }
 
     public List<ProductDtoRead> readAll() {
         return repository.findAll().stream().map(mapper::toDtoRead).collect(Collectors.toList());
     }
-
-//    private Optional<Product> exists(Long id) {
-//        if(!(id instanceof Long) || id < 0) {
-//            return Optional.empty();
-//        }
-//        Optional<Product> productOptional = repository.findProductById(id);
-//
-//        return productOptional;
-//
-//    }
 }
