@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Service
-public class ProductMapper {
+public class ProductMapper {        //TODO use lombok builder
 
     public ProductMapper() {
     }
@@ -23,6 +23,7 @@ public class ProductMapper {
         result.setId(product.getId());
         result.setName(product.getName());
         result.setPrice(product.getPrice());
+        result.setQuantity(product.getQuantity());
         result.setCategory(product.getCategory());
         result.setExpiryDate(offsetDateTime);
 
@@ -47,6 +48,7 @@ public class ProductMapper {
         result.setId(dto.getId());
         result.setName(dto.getName());
         result.setPrice(dto.getPrice());
+        result.setQuantity(dto.getQuantity());
         result.setCategory(dto.getCategory());
         result.setExpiryDate(dto.getExpiryDate().toLocalDateTime());
 

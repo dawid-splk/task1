@@ -1,10 +1,13 @@
 package com.internship.task1.product;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.openapitools.model.CategoryEnum;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -17,19 +20,32 @@ import java.util.stream.Collectors;
 public class ProductService {
     private ProductRepository repository;
     private ProductMapper mapper;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
 //    public ProductService() {
 //    }
 
-    public ProductService(ProductRepository repository, ProductMapper mapper) {
+    public ProductService(ProductRepository repository, ProductMapper mapper, KafkaTemplate<String, Object> kafkaTemplate) {
         this.repository = repository;
         this.mapper = mapper;
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    @KafkaListener(topics = "store_status")
+    void listener(ConsumerRecord<String, Float> record) {
+        long id = Long.parseLong(record.key());
+        Product productToUpdate = repository.findProductById(id).orElseThrow(() -> new IllegalStateException());
+        productToUpdate.setQuantity(record.value());     //TODO float w sygnaturze metody i brak castowania
+        repository.save(productToUpdate);
     }
 
 
     ProductDtoRead save(ProductDtoWrite product) {
         Product productToAdd = mapper.fromDtoWriteToProduct(product);
         repository.save(productToAdd);
+
+        kafkaTemplate.send("store_control", String.valueOf(productToAdd.getId()), null);
+
         return mapper.toDtoRead(productToAdd);
     }
 

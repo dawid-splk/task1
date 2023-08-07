@@ -14,22 +14,23 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements ProductsApi {          //TODO ENDPOINT /PRODUCTS ZWERYFIKOWAC BO MIESZA
+public class ProductController implements ProductsApi {
 
     ProductService service;
-
-    @Override
-    public ResponseEntity<List<ProductDtoRead>> readAll(){
-        return ResponseEntity.ok(service.readAll());
-    }
 
     public ProductController(ProductService service) {
         this.service = service;
     }
 
+
     @Override
     public Optional<NativeWebRequest> getRequest() {
         return ProductsApi.super.getRequest();
+    }
+
+    @Override
+    public ResponseEntity<List<ProductDtoRead>> readAll(){
+        return ResponseEntity.ok(service.readAll());
     }
 
     @Override
