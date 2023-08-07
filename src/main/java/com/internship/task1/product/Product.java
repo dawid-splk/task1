@@ -15,6 +15,7 @@ public class Product {
 
     private String name;
     private float price;
+    private float quantity;
     private CategoryEnum category;
     private LocalDateTime expiryDate;
 
@@ -43,6 +44,14 @@ public class Product {
 
     protected void setPrice(float price) {
         this.price = price;
+    }
+
+    protected float getQuantity() {
+        return quantity;
+    }
+
+    protected void setQuantity(float quantity) {
+        this.quantity = quantity;
     }
 
     protected CategoryEnum getCategory() {

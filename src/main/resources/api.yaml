@@ -265,6 +265,10 @@ components:
           type: number
           format: float
           example: 14.99
+        quantity:
+          type: number
+          format: float
+          example: 1.5
         category:
           $ref: '#/components/schemas/CategoryEnum'
         expiry_date:
