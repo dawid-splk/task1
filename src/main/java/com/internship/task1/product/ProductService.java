@@ -1,5 +1,6 @@
 package com.internship.task1.product;
 
+import lombok.AllArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.openapitools.model.CategoryEnum;
 import org.openapitools.model.ProductDtoRead;
@@ -17,25 +18,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ProductService {
+
     private ProductRepository repository;
     private ProductMapper mapper;
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-//    public ProductService() {
-//    }
-
-    public ProductService(ProductRepository repository, ProductMapper mapper, KafkaTemplate<String, Object> kafkaTemplate) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.kafkaTemplate = kafkaTemplate;
-    }
 
     @KafkaListener(topics = "store_status")
     void listener(ConsumerRecord<String, Float> record) {
         long id = Long.parseLong(record.key());
         Product productToUpdate = repository.findProductById(id).orElseThrow(() -> new IllegalStateException());
-        productToUpdate.setQuantity(record.value());     //TODO float w sygnaturze metody i brak castowania
+        productToUpdate.setQuantity(record.value());
         repository.save(productToUpdate);
     }
 

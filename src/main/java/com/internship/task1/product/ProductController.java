@@ -1,6 +1,7 @@
 package com.internship.task1.product;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import org.openapitools.api.ProductsApi;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
@@ -14,13 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@AllArgsConstructor
 public class ProductController implements ProductsApi {
 
     ProductService service;
-
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
 
 
     @Override
