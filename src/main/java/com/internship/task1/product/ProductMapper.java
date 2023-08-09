@@ -30,9 +30,14 @@ public class ProductMapper {        //TODO use lombok builder
         return result;
     }
 
-    public Product fromDtoWriteToProduct(ProductDtoWrite dto){
+    public Product fromDtoWriteToProduct(ProductDtoWrite dto, Long id, float quantity){
 
         Product result = new Product();
+        if(id != -1){
+            result.setId(id);
+        }
+        result.setQuantity(quantity);
+
         result.setName(dto.getName());
         result.setPrice(dto.getPrice());
         result.setCategory(dto.getCategory());

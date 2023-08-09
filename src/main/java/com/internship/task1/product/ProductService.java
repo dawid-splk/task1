@@ -41,7 +41,7 @@ public class ProductService {
 
 
     ProductDtoRead save(ProductDtoWrite product) {
-        Product productToAdd = mapper.fromDtoWriteToProduct(product);
+        Product productToAdd = mapper.fromDtoWriteToProduct(product, -1L, 0.0F);
         repository.save(productToAdd);
 
         kafkaTemplate.send("store_control", String.valueOf(productToAdd.getId()), null);
@@ -74,13 +74,11 @@ public class ProductService {
         }
     }
 
-    ResponseEntity<Void> updateProduct(ProductDtoRead productDto) {
-        var id = productDto.getId();
-
-        Optional<Product> productOptional = repository.findProductById(id);
+    ResponseEntity<Void> updateProduct(Long productId, ProductDtoWrite productDtoWrite) {
+        Optional<Product> productOptional = repository.findProductById(productId);
 
         if(productOptional.isPresent()){
-            repository.save(mapper.fromDtoReadToProduct(productDto));
+            repository.save(mapper.fromDtoWriteToProduct(productDtoWrite, productOptional.get().getId(), productOptional.get().getQuantity()));
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

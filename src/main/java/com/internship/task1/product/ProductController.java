@@ -54,9 +54,10 @@ public class ProductController implements ProductsApi {
         return service.findProductById(productId);
     }
 
+
     @Override
-    public ResponseEntity<Void> updateProduct(ProductDtoRead product) {
-        return service.updateProduct(product);
+    public ResponseEntity<Void> updateProduct(Long productId, ProductDtoWrite productDtoWrite) {
+        return service.updateProduct(productId, productDtoWrite);
     }
 
     @Override

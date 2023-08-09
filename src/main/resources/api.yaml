@@ -31,34 +31,6 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-    put:
-      tags:
-        - product
-      summary: Update an existing product
-      description: Update an existing product
-      operationId: updateProduct
-      requestBody:
-        description: product object with desired values
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-        required: true
-      responses:
-        '404':
-          description: Product not found
-        '405':
-          description: Invalid input
-      security:
-        - shop_auth:
-            - write:products
-            - read:products
     post:
       tags:
         - product
@@ -169,6 +141,42 @@ paths:
           description: Product not found
       security:
         - product_auth:
+            - write:products
+            - read:products
+    put:
+      tags:
+        - product
+      summary: Update an existing product
+      description: Update an existing product
+      operationId: updateProduct
+      parameters:
+        - name: productId
+          in: path
+          description: ID of product to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: product object with desired values
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+        required: true
+      responses:
+        '404':
+          description: Product not found
+        '405':
+          description: Invalid input
+      security:
+        - shop_auth:
             - write:products
             - read:products
     patch:
