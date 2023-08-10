@@ -35,7 +35,7 @@ public class ProductService {
     }
 
 
-    ProductDtoRead save(ProductDtoWrite product) {
+    ProductDtoRead save(ProductDtoWrite product) {      //TODO integration test (test if products gets ID)
         Product productToAdd = mapper.fromDtoWriteToProduct(product, -1L, 0.0F);
         repository.save(productToAdd);
 
@@ -44,7 +44,7 @@ public class ProductService {
         return mapper.toDtoRead(productToAdd);
     }
 
-    ResponseEntity<Void> deleteProduct(Long id) {
+    ResponseEntity<Void> deleteProduct(Long id) {       //TODO integration test
         Optional<Product> productOptional = repository.findProductById(id);
         if(productOptional.isPresent()){
             productOptional.ifPresent(repository::delete);
@@ -54,7 +54,7 @@ public class ProductService {
         }
     }
 
-    public List<ProductDtoRead> findProductsByCategory(String category) {
+    public List<ProductDtoRead> findProductsByCategory(String category) {       //TODO integration test
         return repository.findAllByCategory(CategoryEnum.fromValue(category))
                 .stream().map(mapper::toDtoRead)
                 .collect(Collectors.toList());
@@ -80,7 +80,7 @@ public class ProductService {
         }
     }
 
-    ResponseEntity<Void> updateProduct(Long productId, String name, Float price, String category, @RequestParam("expiryDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
+    ResponseEntity<Void> updateProduct(Long productId, String name, Float price, String category, /*@RequestParam("expiryDate")*/ @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
         Optional<Product> productOptional = repository.findProductById(productId);
 
         if(productOptional.isPresent()){

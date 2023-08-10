@@ -15,7 +15,7 @@ public class ProductMapper {
 
     public ProductDtoRead toDtoRead(Product product){
 
-        ZoneOffset zoneOffset = ZoneOffset.of("+01:00");
+        ZoneOffset zoneOffset = ZoneOffset.of("+02:00");
         LocalDateTime localDateTime = product.getExpiryDate();
         OffsetDateTime offsetDateTime = localDateTime.atOffset(zoneOffset);
 
