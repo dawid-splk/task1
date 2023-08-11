@@ -12,6 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,13 +37,15 @@ public class ProductService {
     }
 
 
-    ProductDtoRead save(ProductDtoWrite product) {      //TODO integration test (test if products gets ID)
+    ResponseEntity<ProductDtoRead> save(ProductDtoWrite product) {      //TODO integration test (test if products gets ID)
         Product productToAdd = mapper.fromDtoWriteToProduct(product, -1L, 0.0F);
         repository.save(productToAdd);
 
         kafkaTemplate.send("store_control", String.valueOf(productToAdd.getId()), null);
 
-        return mapper.toDtoRead(productToAdd);
+        ProductDtoRead response = mapper.toDtoRead(productToAdd);
+
+        return ResponseEntity.created(URI.create("/" + response.getId())).body(response);
     }
 
     ResponseEntity<Void> deleteProduct(Long id) {       //TODO integration test
@@ -54,10 +58,12 @@ public class ProductService {
         }
     }
 
-    public List<ProductDtoRead> findProductsByCategory(String category) {       //TODO integration test
-        return repository.findAllByCategory(CategoryEnum.fromValue(category))
-                .stream().map(mapper::toDtoRead)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<ProductDtoRead>> findProductsByCategory(String category) {       //TODO integration test
+        return ResponseEntity.ok
+                (repository.findAllByCategory(CategoryEnum.fromValue(category))
+                .stream()
+                .map(mapper::toDtoRead)
+                .toList());
     }
 
     ResponseEntity<ProductDtoRead> findProductById(Long id) {
@@ -80,7 +86,7 @@ public class ProductService {
         }
     }
 
-    ResponseEntity<Void> updateProduct(Long productId, String name, Float price, String category, /*@RequestParam("expiryDate")*/ @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime expiryDate) {
+    ResponseEntity<Void> updateProduct(Long productId, String name, Float price, String category, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiryDate) {
         Optional<Product> productOptional = repository.findProductById(productId);
 
         if(productOptional.isPresent()){
@@ -95,7 +101,7 @@ public class ProductService {
                 toUpdate.setCategory(CategoryEnum.fromValue(category));
             }
             if(expiryDate != null) {
-                toUpdate.setExpiryDate(expiryDate.toLocalDateTime());
+                toUpdate.setExpiryDate(expiryDate);
             }
             repository.save(toUpdate);
             return ResponseEntity.noContent().build();
@@ -104,7 +110,11 @@ public class ProductService {
         }
     }
 
-    public List<ProductDtoRead> readAll() {
-        return repository.findAll().stream().map(mapper::toDtoRead).collect(Collectors.toList());
+    public ResponseEntity<List<ProductDtoRead>> readAll() {
+        return ResponseEntity.ok
+                (repository.findAll()
+                .stream()
+                .map(mapper::toDtoRead)
+                .collect(Collectors.toList()));
     }
 }

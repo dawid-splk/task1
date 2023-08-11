@@ -292,10 +292,13 @@ components:
           type: string
           description: name of product
           example: milk
+          minLength: 3
+          maxLength: 40
         price:
           type: number
           format: float
           example: 14.99
+          minimum: 0
         category:
           $ref: '#/components/schemas/CategoryEnum'
         expiry_date:

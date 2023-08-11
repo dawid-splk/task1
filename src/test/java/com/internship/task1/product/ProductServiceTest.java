@@ -47,7 +47,7 @@ public class ProductServiceTest {
         dtoWrite.setName("ser krolewski Sierpc");
         dtoWrite.setPrice(5.99F);
         dtoWrite.setCategory(CategoryEnum.fromValue("dairy products"));
-        dtoWrite.setExpiryDate(OffsetDateTime.now());
+        dtoWrite.setExpiryDate(LocalDateTime.now());
 
     }
 
@@ -60,7 +60,7 @@ public class ProductServiceTest {
         when(mapper.toDtoRead(any(Product.class))).thenCallRealMethod();
 
         // When
-        ProductDtoRead result = service.save(dtoWrite);
+        ProductDtoRead result = service.save(dtoWrite).getBody();
 
         //Then      //TODO testy integracyjne (repository.save() by nadac id)
         assertEquals(result.getName(), dtoWrite.getName());
@@ -158,7 +158,7 @@ public class ProductServiceTest {
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(new Product()));
         when(repository.save(any(Product.class))).thenReturn(null);
         // When
-        var response = service.updateProduct(204L, "test", 5.0F, null, OffsetDateTime.now());
+        var response = service.updateProduct(204L, "test", 5.0F, null, LocalDateTime.now());
 
         //Then
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
@@ -170,7 +170,7 @@ public class ProductServiceTest {
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
 
         // When
-        var response = service.updateProduct(204L, "test", 5.0F, null, OffsetDateTime.now());
+        var response = service.updateProduct(204L, "test", 5.0F, null, LocalDateTime.now());
 
         //Then
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -182,11 +182,11 @@ public class ProductServiceTest {
         when(repository.findAll()).thenReturn(new ArrayList<Product>());
 
         // When
-        var result = service.readAll();
+        var result = service.readAll().getBody();
 
         // Then
         assertEquals(0, result.size());
-        assertTrue(result instanceof List<ProductDtoRead>);
+        assertTrue(result instanceof ArrayList<ProductDtoRead>);
 
     }
 
@@ -199,7 +199,7 @@ public class ProductServiceTest {
         when(repository.findAll()).thenReturn(new ArrayList<Product>(List.of(product)));
 
         // When
-        var result = service.readAll();
+        var result = service.readAll().getBody();
 
         // Then
         assertEquals(1, result.size());
@@ -212,7 +212,7 @@ public class ProductServiceTest {
                 product.getPrice() == dtoRead.getPrice() &&
                 product.getQuantity() == dtoRead.getQuantity() &&
                 product.getCategory() == dtoRead.getCategory() &&
-                product.getExpiryDate() == dtoRead.getExpiryDate().toLocalDateTime();
+                product.getExpiryDate() == dtoRead.getExpiryDate();
     }
 
 

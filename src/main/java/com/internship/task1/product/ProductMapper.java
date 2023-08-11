@@ -14,19 +14,29 @@ import java.time.ZoneOffset;
 public class ProductMapper {
 
     public ProductDtoRead toDtoRead(Product product){
+        ProductDtoRead result = new ProductDtoRead();
 
-        ZoneOffset zoneOffset = ZoneOffset.of("+02:00");
-        LocalDateTime localDateTime = product.getExpiryDate();
-        OffsetDateTime offsetDateTime = localDateTime.atOffset(zoneOffset);
+        result.setId(product.getId());
+        result.setName(product.getName());
+        result.setPrice(product.getPrice());
+        result.setQuantity(product.getQuantity());
+        result.setCategory(product.getCategory());
+        result.setExpiryDate(product.getExpiryDate());
 
-        return ProductDtoRead.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .category(product.getCategory())
-                .expiryDate(offsetDateTime)
-                .build();
+        return result;
+
+    }
+
+    public ProductDtoRead fromDtoWriteToDtoRead(ProductDtoWrite product){
+
+        ProductDtoRead result = new ProductDtoRead();
+
+        result.setName(product.getName());
+        result.setPrice(product.getPrice());
+        result.setCategory(product.getCategory());
+        result.setExpiryDate(product.getExpiryDate());
+
+        return result;
     }
 
     public Product fromDtoWriteToProduct(ProductDtoWrite dto, Long id, float quantity){
@@ -37,7 +47,7 @@ public class ProductMapper {
                 .price(dto.getPrice())
                 .quantity(quantity)
                 .category(dto.getCategory())
-                .expiryDate(dto.getExpiryDate().toLocalDateTime())
+                .expiryDate(dto.getExpiryDate())
                 .build();
     }
 

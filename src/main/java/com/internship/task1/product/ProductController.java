@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +29,12 @@ public class ProductController implements ProductsApi {
 
     @Override
     public ResponseEntity<List<ProductDtoRead>> readAll(){
-        return ResponseEntity.ok(service.readAll());
+        return service.readAll();
     }
 
     @Override
     public ResponseEntity<ProductDtoRead> addProduct(ProductDtoWrite product) {
-        ProductDtoRead response = service.save(product);
-        return ResponseEntity.created(URI.create("/" + response.getId())).body(response);
+        return service.save(product);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ProductController implements ProductsApi {
 
     @Override
     public ResponseEntity<List<ProductDtoRead>> findProductsByCategory(@NotNull String category) {
-        return ResponseEntity.ok(service.findProductsByCategory(category));
+        return service.findProductsByCategory(category);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ProductController implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, OffsetDateTime expiryDate) {
+    public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, LocalDateTime expiryDate) {
         return service.updateProduct(productId, name, price, category, expiryDate);
     }
 
