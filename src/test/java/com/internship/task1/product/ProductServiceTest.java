@@ -1,5 +1,6 @@
 package com.internship.task1.product;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,22 +10,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CategoryEnum;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@MockBean({KafkaProducer.class})
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
 
@@ -33,8 +31,6 @@ public class ProductServiceTest {
 
     @Mock
     ProductRepository repository;
-
-
 
     @Mock
     ProductMapper mapper;
@@ -53,43 +49,31 @@ public class ProductServiceTest {
         dtoWrite.setCategory(CategoryEnum.fromValue("dairy products"));
         dtoWrite.setExpiryDate(OffsetDateTime.now());
 
-        mockDatabase = new HashMap<>();
     }
 
 
     @Test
     void testCreateProduct_whenValidProductDtoWritePassed_shouldReturnProductDtoRead(){
         // Given
-        when(repository.save(any(Product.class))).thenAnswer(invocation -> {
-            Product product = invocation.getArgument(0);
-            product.setId((long) (mockDatabase.size() + 1));
-            mockDatabase.put(product.getId(), product);
-
-            return product;
-        });
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.<Product>getArgument(0));
         when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
         when(mapper.toDtoRead(any(Product.class))).thenCallRealMethod();
-        when(kafka.send(any(), any(), any())).thenReturn(null);
 
         // When
         ProductDtoRead result = service.save(dtoWrite);
 
-        //Then
-        assertEquals(1L, result.getId());     //TODO testy integracyjne (repository.save() by nadac id)
-        assertEquals(1, mockDatabase.size());
-        assertEquals(result.getName(), mockDatabase.get(1L).getName());
-        assertEquals(result.getPrice(), mockDatabase.get(1L).getPrice());
-        assertEquals(result.getCategory(), mockDatabase.get(1L).getCategory());
-        assertEquals(result.getExpiryDate().toLocalDateTime(), mockDatabase.get(1L).getExpiryDate());
+        //Then      //TODO testy integracyjne (repository.save() by nadac id)
+        assertEquals(result.getName(), dtoWrite.getName());
+        assertEquals(result.getPrice(), dtoWrite.getPrice());
+        assertEquals(result.getCategory(), dtoWrite.getCategory());
+        assertEquals(result.getExpiryDate(), dtoWrite.getExpiryDate());
     }
 
     @Test
     void testDeleteProduct_whenIdValid_shouldReturnNoContent(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(new Product()));
-        doAnswer(invocationOnMock -> {
-            return mockDatabase.remove(1L);
-        }).when(repository).delete(any(Product.class));
+        doNothing().when(repository).delete(any(Product.class));
 
         // When
         var response = service.deleteProduct(204L);
@@ -114,14 +98,8 @@ public class ProductServiceTest {
     @Test
     void testFindProductById_whenIdValid_shouldReturnProduct(){
         // Given
-        Product product = Product.builder()
-                .id(1L)
-                .name("ser krolewski Sierpc")
-                .price(5.99F)
-                .quantity(4.0F)
-                .category(CategoryEnum.DAIRY_PRODUCTS)
-                .expiryDate(LocalDateTime.now())
-                .build();
+        when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
+        Product product = mapper.fromDtoWriteToProduct(dtoWrite, 1L, 0.0F);
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(product));
 
         // When
@@ -150,18 +128,11 @@ public class ProductServiceTest {
     @Test
     void testUpdateProduct_whenIdValid_shouldReturnNoContent(){
         // Given
-        Product product = Product.builder()
-                .id(1L)
-                .name("ser krolewski Sierpc")
-                .price(5.99F)
-                .quantity(4.0F)
-                .category(CategoryEnum.DAIRY_PRODUCTS)
-                .expiryDate(LocalDateTime.now())
-                .build();
+        when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
+        Product product = mapper.fromDtoWriteToProduct(dtoWrite, 1L, 15f);
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(product));
         when(repository.save(any(Product.class))).thenReturn(null);
-        when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
-
+//        when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
         // When
         var response = service.updateProduct(204L, dtoWrite);
 
@@ -169,7 +140,90 @@ public class ProductServiceTest {
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
+    @Test
+    void testUpdateProduct_whenIdNotFound_shouldReturnNotFound(){
+        // Given
+        when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
 
+        // When
+        var response = service.updateProduct(404L, dtoWrite);
+
+        //Then
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdateProductWithForm_whenIdValid_shouldReturnNoContent(){
+        // Given
+        when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(new Product()));
+        when(repository.save(any(Product.class))).thenReturn(null);
+        // When
+        var response = service.updateProduct(204L, "test", 5.0F, null, OffsetDateTime.now());
+
+        //Then
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdateProductWithForm_whenIdNotFound_shouldReturnNotFound(){
+        // Given
+        when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
+
+        // When
+        var response = service.updateProduct(204L, "test", 5.0F, null, OffsetDateTime.now());
+
+        //Then
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testReadAll_whenNoProducts_shouldReturnEmptyListOfDto() {
+        // Given
+        when(repository.findAll()).thenReturn(new ArrayList<Product>());
+
+        // When
+        var result = service.readAll();
+
+        // Then
+        assertEquals(0, result.size());
+        assertTrue(result instanceof List<ProductDtoRead>);
+
+    }
+
+    @Test
+    void testReadAll_whenProductPresent_shouldReturnListOfDto() {
+        // Given
+        when(mapper.toDtoRead(any(Product.class))).thenCallRealMethod();
+        when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
+        Product product = mapper.fromDtoWriteToProduct(dtoWrite, 1L, 44.0F);
+        when(repository.findAll()).thenReturn(new ArrayList<Product>(List.of(product)));
+
+        // When
+        var result = service.readAll();
+
+        // Then
+        assertEquals(1, result.size());
+        assertTrue(equals(product, result.get(0)));
+    }
+
+    private static boolean equals(Product product, ProductDtoRead dtoRead) {
+        return product.getId() == dtoRead.getId() &&
+                Objects.equals(product.getName(), dtoRead.getName()) &&
+                product.getPrice() == dtoRead.getPrice() &&
+                product.getQuantity() == dtoRead.getQuantity() &&
+                product.getCategory() == dtoRead.getCategory() &&
+                product.getExpiryDate() == dtoRead.getExpiryDate().toLocalDateTime();
+    }
 
 
 }
+
+
+// Given
+
+
+// When
+
+
+// Then
+
