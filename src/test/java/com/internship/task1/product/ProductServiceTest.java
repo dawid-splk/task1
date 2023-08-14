@@ -2,6 +2,7 @@ package com.internship.task1.product;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,6 +54,7 @@ public class ProductServiceTest {
 
 
     @Test
+    @DisplayName("Product can be created")
     void testCreateProduct_whenValidProductDtoWritePassed_shouldReturnProductDtoRead(){
         // Given
         when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.<Product>getArgument(0));
@@ -70,6 +72,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is found and deleted")
     void testDeleteProduct_whenIdValid_shouldReturnNoContent(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(new Product()));
@@ -83,6 +86,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is not found and cannot be deleted")
     void testDeleteProduct_whenIdNotFound_shouldReturnNotFound(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
@@ -96,6 +100,7 @@ public class ProductServiceTest {
 
 
     @Test
+    @DisplayName("Product is found and returned")
     void testFindProductById_whenIdValid_shouldReturnProduct(){
         // Given
         when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
@@ -112,6 +117,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is not found and cannot be returned")
     void testFindProductById_whenIdNotFound_shouldReturnNotFound(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
@@ -126,6 +132,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is found and updated")
     void testUpdateProduct_whenIdValid_shouldReturnNoContent(){
         // Given
         when(mapper.fromDtoWriteToProduct(any(ProductDtoWrite.class), any(Long.class), any(Float.class))).thenCallRealMethod();
@@ -141,6 +148,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is not found and cannot be updated")
     void testUpdateProduct_whenIdNotFound_shouldReturnNotFound(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
@@ -153,6 +161,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is found and updated with form")
     void testUpdateProductWithForm_whenIdValid_shouldReturnNoContent(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.of(new Product()));
@@ -165,6 +174,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Product is not found and cannot be updated with form")
     void testUpdateProductWithForm_whenIdNotFound_shouldReturnNotFound(){
         // Given
         when(repository.findProductById(any(Long.class))).thenReturn(Optional.empty());
@@ -177,6 +187,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Read all returns empty list")
     void testReadAll_whenNoProducts_shouldReturnEmptyListOfDto() {
         // Given
         when(repository.findAll()).thenReturn(new ArrayList<Product>());
@@ -191,6 +202,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Read all returns list of products")
     void testReadAll_whenProductPresent_shouldReturnListOfDto() {
         // Given
         when(mapper.toDtoRead(any(Product.class))).thenCallRealMethod();
@@ -217,13 +229,3 @@ public class ProductServiceTest {
 
 
 }
-
-
-// Given
-
-
-// When
-
-
-// Then
-

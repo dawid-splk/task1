@@ -1,5 +1,6 @@
 package com.internship.task1.product;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.openapitools.api.ProductsApi;
@@ -33,7 +34,7 @@ public class ProductController implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductDtoRead> addProduct(ProductDtoWrite product) {
+    public ResponseEntity<ProductDtoRead> addProduct(@Valid ProductDtoWrite product) {
         return service.save(product);
     }
 
