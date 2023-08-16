@@ -7,6 +7,7 @@ import org.openapitools.api.ProductsApi;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
@@ -34,7 +35,7 @@ public class ProductController implements ProductsApi {
     }
 
     @Override
-    public ResponseEntity<ProductDtoRead> addProduct(@Valid ProductDtoWrite product) {
+    public ResponseEntity<ProductDtoRead> addProduct(@RequestBody @Valid ProductDtoWrite product) {
         return service.save(product);
     }
 

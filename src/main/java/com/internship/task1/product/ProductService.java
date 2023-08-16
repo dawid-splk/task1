@@ -1,5 +1,6 @@
 package com.internship.task1.product;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.openapitools.model.CategoryEnum;
@@ -37,7 +38,7 @@ public class ProductService {
     }
 
 
-    ResponseEntity<ProductDtoRead> save(ProductDtoWrite product) {      //TODO integration test (test if products gets ID)
+    ResponseEntity<ProductDtoRead> save(@Valid ProductDtoWrite product) {
         Product productToAdd = mapper.fromDtoWriteToProduct(product, -1L, 0.0F);
         repository.save(productToAdd);
 

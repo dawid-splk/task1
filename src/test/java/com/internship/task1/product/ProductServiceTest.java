@@ -64,7 +64,7 @@ public class ProductServiceTest {
         // When
         ProductDtoRead result = service.save(dtoWrite).getBody();
 
-        //Then      //TODO testy integracyjne (repository.save() by nadac id)
+        //Then
         assertEquals(result.getName(), dtoWrite.getName());
         assertEquals(result.getPrice(), dtoWrite.getPrice());
         assertEquals(result.getCategory(), dtoWrite.getCategory());

@@ -80,7 +80,7 @@ public class ProductControllerWebLayerTest {
 //    @Test
     void testCreateProduct_whenNameTooShort_shouldReturnBadRequest() throws Exception {         //VALIDACJA NIE DZIALA - adnotacja @Size przy getterze a nie przy polu
         // Given
-        productDetails.setName("I");
+        productDetails.setName("");
         productDetails.setPrice(-5f);
         RequestBuilder requestBuilder = getPostRequestBuilder();
 //        when(service.save(any(ProductDtoWrite.class))).thenReturn(ResponseEntity.badRequest().build());
