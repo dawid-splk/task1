@@ -6,7 +6,7 @@ info:
 servers:
   - url: 'https:localhost:8080'
 paths:
-  /product:
+  /products:
     get:
       tags:
         - product
@@ -27,34 +27,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductDtoRead'
-      security:
-        - shop_auth:
-            - write:products
-            - read:products
-    put:
-      tags:
-        - product
-      summary: Update an existing product
-      description: Update an existing product
-      operationId: updateProduct
-      requestBody:
-        description: product object with desired values
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ProductDtoRead'
-        required: true
-      responses:
-        '404':
-          description: Product not found
-        '405':
-          description: Invalid input
       security:
         - shop_auth:
             - write:products
@@ -94,7 +66,7 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-  /product/findByCategory:
+  /products/findByCategory:
     get:
       tags:
         - product
@@ -138,7 +110,7 @@ paths:
         - shop_auth:
             - write:products
             - read:products
-  /product/{productId}:
+  /products/{productId}:
     get:
       tags:
         - product
@@ -169,6 +141,42 @@ paths:
           description: Product not found
       security:
         - product_auth:
+            - write:products
+            - read:products
+    put:
+      tags:
+        - product
+      summary: Update an existing product
+      description: Update an existing product
+      operationId: updateProduct
+      parameters:
+        - name: productId
+          in: path
+          description: ID of product to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: product object with desired values
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductDtoWrite'
+        required: true
+      responses:
+        '404':
+          description: Product not found
+        '405':
+          description: Invalid input
+      security:
+        - shop_auth:
             - write:products
             - read:products
     patch:
@@ -265,6 +273,10 @@ components:
           type: number
           format: float
           example: 14.99
+        quantity:
+          type: number
+          format: float
+          example: 1.5
         category:
           $ref: '#/components/schemas/CategoryEnum'
         expiry_date:
@@ -280,10 +292,13 @@ components:
           type: string
           description: name of product
           example: milk
+          minLength: 3
+          maxLength: 40
         price:
           type: number
           format: float
           example: 14.99
+          minimum: 0
         category:
           $ref: '#/components/schemas/CategoryEnum'
         expiry_date:

@@ -1,5 +1,6 @@
 package com.internship.task1.product;
 
+import lombok.NoArgsConstructor;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.stereotype.Service;
@@ -9,47 +10,44 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Service
+@NoArgsConstructor
 public class ProductMapper {
 
-    public ProductMapper() {
-    }
-
     public ProductDtoRead toDtoRead(Product product){
-        ZoneOffset zoneOffset = ZoneOffset.of("+01:00");
-        LocalDateTime localDateTime = product.getExpiryDate();
-        OffsetDateTime offsetDateTime = localDateTime.atOffset(zoneOffset);
-
         ProductDtoRead result = new ProductDtoRead();
+
         result.setId(product.getId());
         result.setName(product.getName());
         result.setPrice(product.getPrice());
+        result.setQuantity(product.getQuantity());
         result.setCategory(product.getCategory());
-        result.setExpiryDate(offsetDateTime);
+        result.setExpiryDate(product.getExpiryDate());
+
+        return result;
+
+    }
+
+    public ProductDtoRead fromDtoWriteToDtoRead(ProductDtoWrite product){
+
+        ProductDtoRead result = new ProductDtoRead();
+
+        result.setName(product.getName());
+        result.setPrice(product.getPrice());
+        result.setCategory(product.getCategory());
+        result.setExpiryDate(product.getExpiryDate());
 
         return result;
     }
 
-    public Product fromDtoWriteToProduct(ProductDtoWrite dto){
+    public Product fromDtoWriteToProduct(ProductDtoWrite dto, Long id, float quantity){
 
-        Product result = new Product();
-        result.setName(dto.getName());
-        result.setPrice(dto.getPrice());
-        result.setCategory(dto.getCategory());
-        result.setExpiryDate(dto.getExpiryDate().toLocalDateTime());
-
-        return result;
-    }
-
-    public Product fromDtoReadToProduct(ProductDtoRead dto){
-
-        Product result = new Product();
-
-        result.setId(dto.getId());
-        result.setName(dto.getName());
-        result.setPrice(dto.getPrice());
-        result.setCategory(dto.getCategory());
-        result.setExpiryDate(dto.getExpiryDate().toLocalDateTime());
-
-        return result;
+        return Product.builder()
+                .id(id != -1 ? id : null)
+                .name(dto.getName())
+                .price(dto.getPrice())
+                .quantity(quantity)
+                .category(dto.getCategory())
+                .expiryDate(dto.getExpiryDate())
+                .build();
     }
 }

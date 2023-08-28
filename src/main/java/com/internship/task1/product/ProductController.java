@@ -1,41 +1,42 @@
 package com.internship.task1.product;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.openapitools.api.ProductApi;
+import lombok.AllArgsConstructor;
+import org.openapitools.api.ProductsApi;
 import org.openapitools.model.ProductDtoRead;
 import org.openapitools.model.ProductDtoWrite;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements ProductApi {
+@AllArgsConstructor
+public class ProductController implements ProductsApi {
 
     ProductService service;
 
-    @Override
-    public ResponseEntity<List<ProductDtoRead>> readAll(){
-        return ResponseEntity.ok(service.readAll());
-    }
-
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
 
     @Override
     public Optional<NativeWebRequest> getRequest() {
-        return ProductApi.super.getRequest();
+        return ProductsApi.super.getRequest();
     }
 
     @Override
-    public ResponseEntity<ProductDtoRead> addProduct(ProductDtoWrite product) {
-        ProductDtoRead response = service.save(product);
-        return ResponseEntity.created(URI.create("/" + response.getId())).body(response);
+    public ResponseEntity<List<ProductDtoRead>> readAll(){
+        return service.readAll();
+    }
+
+    @Override
+    public ResponseEntity<ProductDtoRead> addProduct(@RequestBody @Valid ProductDtoWrite product) {
+        return service.save(product);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class ProductController implements ProductApi {
 
     @Override
     public ResponseEntity<List<ProductDtoRead>> findProductsByCategory(@NotNull String category) {
-        return ResponseEntity.ok(service.findProductsByCategory(category));
+        return service.findProductsByCategory(category);
     }
 
     @Override
@@ -53,13 +54,14 @@ public class ProductController implements ProductApi {
         return service.findProductById(productId);
     }
 
+
     @Override
-    public ResponseEntity<Void> updateProduct(ProductDtoRead product) {
-        return service.updateProduct(product);
+    public ResponseEntity<Void> updateProduct(Long productId, ProductDtoWrite productDtoWrite) {
+        return service.updateProduct(productId, productDtoWrite);
     }
 
     @Override
-    public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, OffsetDateTime expiryDate) {
+    public ResponseEntity<Void> updateProductWithForm(Long productId, String name, Float price, String category, LocalDateTime expiryDate) {
         return service.updateProduct(productId, name, price, category, expiryDate);
     }
 
